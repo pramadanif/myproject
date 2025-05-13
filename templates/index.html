@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pendukung Keputusan Servis Motor</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #f59e0b;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--secondary);
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .form-col {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: var(--dark);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+        
+        .btn-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        #results {
+            display: none;
+        }
+        
+        .result-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .result-header h3 {
+            font-size: 1.3rem;
+            margin: 0;
+        }
+        
+        .result-body {
+            padding: 20px;
+        }
+        
+        .result-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+        
+        .result-value {
+            font-size: 1.1rem;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-danger {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+        
+        .status-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .part-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .part-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .part-checkbox input {
+            width: auto;
+            margin-right: 8px;
+        }
+        
+        .part-km-input {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+        }
+        
+        .motorcycle-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 12px;
+        }
+        
+        .motorcycle-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+        
+        .motorcycle-details h4 {
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+        }
+        
+        .part-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .part-item {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #ddd;
+            transition: transform 0.2s ease;
+        }
+        
+        .part-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .part-item.needs-replacement {
+            border-left-color: var(--danger);
+        }
+        
+        .part-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .part-detail {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin: 3px 0;
+        }
+        
+        .part-status {
+            margin-top: 10px;
+        }
+        
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loader i {
+            font-size: 2rem;
+            color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .logo {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-motorcycle"></i>
+                    <div>
+                        <h1>Sistem Pendukung Keputusan Servis Motor</h1>
+                        <p>Bengkel Motor IndoPerkasa</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="card animate__animated animate__fadeIn">
+            <h2><i class="fas fa-edit"></i> Form Data Servis</h2>
+            <form id="serviceForm">
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="kode_motor">Tipe Motor</label>
+                            <select id="kode_motor" required>
+                                <option value="" disabled selected>Pilih Tipe Motor</option>
+                                <option value="ALL-NEW-AEROX">ALL NEW AEROX</option>
+                                <option value="LEXI">LEXI</option>
+                                <option value="FREE-GO-S">FREE GO S</option>
+                                <option value="MIO">MIO</option>
+                                <option value="NMAX-NEO-S">NMAX NEO S</option>
+                                <option value="X-MAX-CONNEC">X-MAX CONNECT</option>
+                                <option value="ALL-NEW-NMAX">ALL NEW NMAX</option>
+                                <option value="MIO-M3 125">MIO M3 125</option>
+                                <option value="FAZZIO-NEO-HY">FAZZIO NEO HY</option>
+                                <option value="FILANO-NEO">FILANO NEO</option>
+                                <option value="XSR 155">XSR 155</option>
+                                <option value="MT-15">MT-15</option>
+                                <option value="R15">R15</option>
+                                <option value="VIXION">VIXION</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="transmisi">Transmisi</label>
+                            <select id="transmisi" required>
+                                <option value="" disabled selected>Pilih Transmisi</option>
+                                <option value="matic">Matic</option>
+                                <option value="manual">Manual</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tahun">Tahun Kendaraan</label>
+                            <select id="tahun" required>
+                                <option value="" disabled selected>Pilih Tahun</option>
+                                <option value="2018">2018</option>
+                                <option value="2019">2019</option>
+                                <option value="2020">2020</option>
+                                <option value="2021">2021</option>
+                                <option value="2022">2022</option>
+                                <option value="2023">2023</option>
+                                <option value="2024">2024</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="kilometer">Kilometer Saat Ini</label>
+                            <input type="number" id="kilometer" placeholder="Masukkan kilometer saat ini" required min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="km_terakhir_ganti_oli">Kilometer Terakhir Ganti Oli</label>
+                            <input type="number" id="km_terakhir_ganti_oli" placeholder="Kilometer terakhir ganti oli" required min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bulan_terakhir_ganti_oli">Bulan Sejak Terakhir Ganti Oli</label>
+                            <select id="bulan_terakhir_ganti_oli" required>
+                                <option value="" disabled selected>Pilih Bulan</option>
+                                <option value="0">0 (Baru saja)</option>
+                                <option value="1">1 bulan</option>
+                                <option value="2">2 bulan</option>
+                                <option value="3">3 bulan</option>
+                                <option value="4">4 bulan</option>
+                                <option value="5">5 bulan</option>
+                                <option value="6">6 bulan</option>
+                                <option value="7">7 bulan</option>
+                                <option value="8">8 bulan</option>
+                                <option value="9">9 bulan+</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="keluhan_rem">Kondisi Rem</label>
+                            <select id="keluhan_rem" required>
+                                <option value="" disabled selected>Pilih Kondisi Rem</option>
+                                <option value="tidak_ada">Tidak Ada Keluhan</option>
+                                <option value="suara">Ada Suara Saat Pengereman</option>
+                                <option value="kurang_pakem">Kurang Pakem</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="jumlah_keluhan">Jumlah Keluhan Lainnya</label>
+                            <select id="jumlah_keluhan" required>
+                                <option value="" disabled selected>Pilih Jumlah Keluhan</option>
+                                <option value="0">Tidak Ada</option>
+                                <option value="1">1 Keluhan</option>
+                                <option value="2">2 Keluhan</option>
+                                <option value="3">3 Keluhan</option>
+                                <option value="4">4+ Keluhan</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="usia_kendaraan">Usia Kendaraan (tahun)</label>
+                            <input type="number" id="usia_kendaraan" placeholder="Usia kendaraan" required min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="margin-bottom: 15px;"><input type="checkbox" id="has_replaced_parts"> Motor ini sudah pernah ganti sparepart</label>
+                        </div>
+                        
+                        <div id="part_replacement_fields" style="display: none; border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                            <p style="margin-top: 0;"><strong>Pilih sparepart yang sudah pernah diganti:</strong></p>
+                            <div id="part_selection" class="part-selection">
+                                <!-- Checkbox untuk setiap sparepart akan ditambahkan secara dinamis -->
+                            </div>
+                            <div id="part_km_inputs" style="margin-top: 15px;">
+                                <!-- Input kilometer untuk sparepart yang dipilih akan ditambahkan secara dinamis -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-actions">
+                    <button type="button" id="resetBtn" class="btn btn-secondary">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-search"></i> Analisis Kebutuhan Servis
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="loader" id="loader">
+            <i class="fas fa-spinner"></i>
+            <p>Menganalisis data kendaraan...</p>
+        </div>
+        
+        <div class="card animate__animated animate__fadeIn" id="results" style="display: none;">
+            <div class="result-header">
+                <h3><i class="fas fa-clipboard-check"></i> Hasil Analisis Kebutuhan Servis</h3>
+                <span id="date-time"></span>
+            </div>
+            
+            <div class="result-body">
+                <div class="motorcycle-info">
+                    <div class="motorcycle-icon">
+                        <i class="fas fa-motorcycle"></i>
+                    </div>
+                    <div class="motorcycle-details">
+                        <h4 id="motor-type">YAMAHA NMAX</h4>
+                        <div id="info-details">
+                            <span id="motor-year">2022</span> | 
+                            <span id="motor-km">5000 KM</span> | 
+                            <span id="km-per-year">2500 KM/tahun</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-label">Rekomendasi Jenis Servis</div>
+                    <div class="result-value" id="jenis-servis">Servis Rutin</div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-label">Kondisi Oli</div>
+                    <div class="result-value">
+                        <span class="status-badge" id="kondisi-oli">Baik</span>
+                    </div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-label">Kondisi Rem</div>
+                    <div class="result-value">
+                        <span class="status-badge" id="kondisi-rem">Perlu Penyetelan</span>
+                    </div>
+                </div>
+                
+                <div class="result-item">
+                    <div class="result-label">Rekomendasi Part yang Perlu Pemeriksaan/Penggantian</div>
+                    <div class="part-list" id="part-list">
+                        <!-- Parts will be dynamically populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto calculate usia kendaraan
+            const tahunEl = document.getElementById('tahun');
+            const usiaEl = document.getElementById('usia_kendaraan');
+            
+            tahunEl.addEventListener('change', function() {
+                const currentYear = new Date().getFullYear();
+                const selectedYear = parseInt(this.value);
+                usiaEl.value = currentYear - selectedYear;
+            });
+            
+            // Show/hide part replacement fields when checkbox is clicked
+            const hasReplacedPartsCheckbox = document.getElementById('has_replaced_parts');
+            const partReplacementFields = document.getElementById('part_replacement_fields');
+            const partSelectionDiv = document.getElementById('part_selection');
+            const partKmInputsDiv = document.getElementById('part_km_inputs');
+            
+            hasReplacedPartsCheckbox.addEventListener('change', function() {
+                partReplacementFields.style.display = this.checked ? 'block' : 'none';
+                if (this.checked && transmisiEl.value) {
+                    populatePartCheckboxes(transmisiEl.value);
+                }
+            });
+            
+            // Get transmission select element
+            const transmisiEl = document.getElementById('transmisi');
+            
+            // Populate part selection checkboxes based on selected transmission
+            transmisiEl.addEventListener('change', function() {
+                const transmisiType = this.value;
+                // Only update part fields if the replacement checkbox is checked
+                if (hasReplacedPartsCheckbox.checked && transmisiType) {
+                    populatePartCheckboxes(transmisiType);
+                }
+            });
+            
+            // Helper function to populate part checkboxes based on transmission type
+            function populatePartCheckboxes(transmisiType) {
+                // Clear existing checkboxes
+                partSelectionDiv.innerHTML = '';
+                partKmInputsDiv.innerHTML = '';
+                
+                // Get parts based on transmission type
+                let parts = [];
+                if (transmisiType === 'manual') {
+                    parts = [
+                        { name: 'Rantai', id: 'rantai' },
+                        { name: 'Kampas Rem', id: 'kampas_rem' },
+                        { name: 'Gir Depan', id: 'gir_depan' },
+                        { name: 'Gir Belakang', id: 'gir_belakang' },
+                        { name: 'Busi', id: 'busi' },
+                        { name: 'Filter Udara', id: 'filter_udara' },
+                        { name: 'Kampas Kopling', id: 'kampas_kopling' },
+                        { name: 'Kabel Kopling', id: 'kabel_kopling' },
+                        { name: 'Filter Bensin', id: 'filter_bensin' },
+                        { name: 'Saringan Udara', id: 'saringan_udara' }
+                    ];
+                } else if (transmisiType === 'matic') {
+                    parts = [
+                        { name: 'Kampas Rem', id: 'kampas_rem' },
+                        { name: 'V-Belt', id: 'v_belt' },
+                        { name: 'Roller CVT', id: 'roller_cvt' },
+                        { name: 'Kampas Kopling CVT', id: 'kampas_kopling_cvt' },
+                        { name: 'Busi', id: 'busi' },
+                        { name: 'Filter Udara', id: 'filter_udara' },
+                        { name: 'Oil CVT', id: 'oil_cvt' },
+                        { name: 'Cover CVT', id: 'cover_cvt' },
+                        { name: 'Filter Bensin', id: 'filter_bensin' },
+                        { name: 'Saringan Udara', id: 'saringan_udara' }
+                    ];
+                }
+                
+                // Add checkbox for each part
+                parts.forEach(part => {
+                    const div = document.createElement('div');
+                    div.className = 'part-checkbox';
+                    div.innerHTML = `
+                        <input type="checkbox" id="check_${part.id}" data-part-id="${part.id}" data-part-name="${part.name}">
+                        <label for="check_${part.id}">${part.name}</label>
+                    `;
+                    partSelectionDiv.appendChild(div);
+                    
+                    // Add event listener to show/hide KM input when checkbox is toggled
+                    const checkbox = div.querySelector(`#check_${part.id}`);
+                    checkbox.addEventListener('change', function() {
+                        const kmInputId = `km_input_${part.id}`;
+                        const existingInput = document.getElementById(kmInputId);
+                        
+                        if (this.checked) {
+                            // If checked and input doesn't exist, create it
+                            if (!existingInput) {
+                                const inputDiv = document.createElement('div');
+                                inputDiv.className = 'part-km-input';
+                                inputDiv.id = kmInputId;
+                                inputDiv.innerHTML = `
+                                    <label for="km_last_${part.id}"><strong>${part.name}</strong> - KM terakhir diganti:</label>
+                                    <input type="number" id="km_last_${part.id}" class="km-input" placeholder="Masukkan KM saat penggantian" min="0" required>
+                                `;
+                                partKmInputsDiv.appendChild(inputDiv);
+                            }
+                        } else {
+                            // If unchecked and input exists, remove it
+                            if (existingInput) {
+                                existingInput.remove();
+                            }
+                        }
+                    });
+                });
+            }
+            
+            // Set current date and time
+            const dateTimeEl = document.getElementById('date-time');
+            const now = new Date();
+            dateTimeEl.textContent = now.toLocaleDateString('id-ID', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Auto select transmisi based on motorcycle type
+            const kodeMotorEl = document.getElementById('kode_motor');
+            
+            kodeMotorEl.addEventListener('change', function() {
+                const motorType = this.value;
+                // Matic models
+                if (['ALL-NEW-AEROX', 'LEXI', 'FREE-GO-S', 'MIO', 'NMAX-NEO-S', 
+                     'X-MAX-CONNEC', 'ALL-NEW-NMAX', 'MIO-M3 125', 'FAZZIO-NEO-HY', 
+                     'FILANO-NEO'].includes(motorType)) {
+                    transmisiEl.value = 'matic';
+                } 
+                // Manual models
+                else if (['XSR 155', 'MT-15', 'R15', 'VIXION'].includes(motorType)) {
+                    transmisiEl.value = 'manual';
+                }
+            });
+            
+            // Reset form
+            document.getElementById('resetBtn').addEventListener('click', function() {
+                document.getElementById('serviceForm').reset();
+                document.getElementById('results').style.display = 'none';
+            });
+            
+            // Form submission
+            document.getElementById('serviceForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loader
+                document.getElementById('loader').style.display = 'block';
+                document.getElementById('results').style.display = 'none';
+                
+                // Prepare data for API
+                const data = {
+                    kode_motor: document.getElementById('kode_motor').value,
+                    transmisi: document.getElementById('transmisi').value,
+                    tahun: parseInt(document.getElementById('tahun').value),
+                    kilometer: parseInt(document.getElementById('kilometer').value),
+                    km_terakhir_ganti_oli: parseInt(document.getElementById('km_terakhir_ganti_oli').value),
+                    bulan_terakhir_ganti_oli: parseInt(document.getElementById('bulan_terakhir_ganti_oli').value),
+                    keluhan_rem: document.getElementById('keluhan_rem').value,
+                    jumlah_keluhan: parseInt(document.getElementById('jumlah_keluhan').value),
+                    usia_kendaraan: parseInt(document.getElementById('usia_kendaraan').value),
+                    has_replaced_parts: document.getElementById('has_replaced_parts').checked
+                };
+                
+                // Add part replacement data if applicable
+                if (data.has_replaced_parts) {
+                    data.km_terakhir_ganti_parts = {};
+                    
+                    // Collect data from selected parts
+                    const selectedCheckboxes = document.querySelectorAll('#part_selection input[type="checkbox"]:checked');
+                    
+                    if (selectedCheckboxes.length > 0) {
+                        selectedCheckboxes.forEach(checkbox => {
+                            const partId = checkbox.dataset.partId;
+                            const partName = checkbox.dataset.partName;
+                            const kmInput = document.getElementById(`km_last_${partId}`);
+                            
+                            if (kmInput && kmInput.value && kmInput.value.trim() !== '') {
+                                // Gunakan nama part yang sebenarnya dari data attribute
+                                data.km_terakhir_ganti_parts[partName] = parseInt(kmInput.value);
+                            }
+                        });
+                    }
+                    
+                    // Log data for debugging
+                    console.log('Data part yang akan dikirim:', data.km_terakhir_ganti_parts);
+                }
+                
+                // Send API request
+                fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    // Hide loader
+                    document.getElementById('loader').style.display = 'none';
+                    
+                    // Update results
+                    document.getElementById('motor-type').textContent = document.getElementById('kode_motor').value.replace(/-/g, ' ');
+                    document.getElementById('motor-year').textContent = data.tahun;
+                    document.getElementById('motor-km').textContent = data.kilometer + ' KM';
+                    document.getElementById('km-per-year').textContent = result.km_per_tahun + ' KM/tahun';
+                    
+                    document.getElementById('jenis-servis').textContent = result.jenis_servis;
+                    
+                    // Update oil condition
+                    const oilCondition = document.getElementById('kondisi-oli');
+                    oilCondition.textContent = result.kondisi_oli;
+                    if (result.kondisi_oli === 'Baik') {
+                        oilCondition.className = 'status-badge status-success';
+                    } else if (result.kondisi_oli === 'Perlu Ganti') {
+                        oilCondition.className = 'status-badge status-warning';
+                    } else {
+                        oilCondition.className = 'status-badge status-danger';
+                    }
+                    
+                    // Update brake condition
+                    const brakeCondition = document.getElementById('kondisi-rem');
+                    brakeCondition.textContent = result.kondisi_rem;
+                    if (result.kondisi_rem === 'Baik') {
+                        brakeCondition.className = 'status-badge status-success';
+                    } else if (result.kondisi_rem === 'Perlu Penyetelan') {
+                        brakeCondition.className = 'status-badge status-warning';
+                    } else {
+                        brakeCondition.className = 'status-badge status-danger';
+                    }
+                    
+                    // Update parts list
+                    const partListEl = document.getElementById('part-list');
+                    partListEl.innerHTML = '';
+                    
+                    // Filter parts to only show those needing checking or replacement
+                    const partsNeedingCheck = result.parts.filter(part => 
+                        part.status === 'Perlu Pengecekan' || part.needs_replacement
+                    );
+                    
+                    if (partsNeedingCheck.length === 0) {
+                        // If no parts need checking, show a message
+                        const messageEl = document.createElement('div');
+                        messageEl.className = 'animate__animated animate__fadeIn';
+                        messageEl.innerHTML = `
+                            <div class="part-status text-center" style="padding: 20px;">
+                                <span class="status-badge status-success">Semua sparepart masih dalam kondisi baik</span>
+                            </div>
+                        `;
+                        partListEl.appendChild(messageEl);
+                    } else {
+                        // Show only parts that need checking or replacement
+                        partsNeedingCheck.forEach(part => {
+                            const partEl = document.createElement('div');
+                            partEl.className = part.needs_replacement ? 
+                                'part-item needs-replacement animate__animated animate__fadeIn' : 
+                                'part-item animate__animated animate__fadeIn';
+                            
+                            partEl.innerHTML = `
+                                <div class="part-name">
+                                    ${part.name}
+                                    ${part.needs_replacement ? '<i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>' : ''}
+                                </div>
+                                <div class="part-detail">Interval: ${part.interval} KM</div>
+                                <div class="part-detail">KM Terakhir: ${part.km_terdekat} KM</div>
+                                <div class="part-detail">KM Berikutnya: ${part.km_berikutnya} KM</div>
+                                <div class="part-status">
+                                    <span class="status-badge ${part.needs_replacement ? 'status-warning' : 'status-success'}"> 
+                                        ${part.status}
+                                    </span>
+                                </div>
+                            `;
+                            
+                            partListEl.appendChild(partEl);
+                        });
+                    }
+                    
+                    // Show results
+                    document.getElementById('results').style.display = 'block';
+                    
+                    // Scroll to results
+                    document.getElementById('results').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat memproses data. Silakan coba lagi.');
+                    document.getElementById('loader').style.display = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
