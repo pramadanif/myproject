@@ -190,7 +190,7 @@ class SistemPendukungKeputusanServisMotor:
 
 # Definisikan fungsi untuk membuat sistem servis
 def create_sistem_servis():
-    csv_path = os.path.join(os.path.dirname(__file__), 'indoperkasa7.csv')
+    csv_path = os.path.join(os.path.dirname(__file__), 'indoperkasa2.csv')
     print(f"Loading model from data: {csv_path}")
     return SistemPendukungKeputusanServisMotor(csv_path)
 
